@@ -19,7 +19,8 @@ const urlSchema = new mongoose.Schema(
         },
         expiresAt: {
              type: Date,
-            default: null,
+            default: null, 
+            expires: 0,
         },
         visitHistory: [
             {

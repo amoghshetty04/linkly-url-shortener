@@ -1,17 +1,29 @@
 
+/* =========================================
+   LINKLY - GLOBAL STYLES
+========================================= */
+
 * {
   box-sizing: border-box;
 }
 
+html {
+  min-height: 100%;
+}
+
 body {
   margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
   font-family: Inter, Arial, sans-serif;
   color: #17172b;
   background: #f5f6ff;
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 
@@ -19,10 +31,11 @@ button {
   border: none;
   border-radius: 9px;
   background: #635bff;
-  color: white;
+  color: #ffffff;
   padding: 12px 16px;
   cursor: pointer;
   font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 button:hover {
@@ -34,10 +47,27 @@ button:disabled {
   cursor: wait;
 }
 
-a {
-  color: #635bff;
-  text-decoration: none;
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid #818cf8;
+  outline-offset: 3px;
 }
+
+a {
+  color: #4f46e5;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* =========================================
+   LOGIN AND SIGNUP
+========================================= */
 
 .auth-page {
   min-height: 100vh;
@@ -45,13 +75,16 @@ a {
   justify-content: center;
   align-items: center;
   padding: 24px;
+  background: #f5f6ff;
+  color: #17172b;
 }
 
 .auth-card {
   width: 100%;
   max-width: 440px;
   padding: 36px;
-  background: white;
+  background: #ffffff;
+  color: #17172b;
   border: 1px solid #e5e7eb;
   border-radius: 18px;
   box-shadow: 0 12px 40px rgba(30, 30, 80, 0.08);
@@ -67,6 +100,7 @@ a {
 .auth-card h1 {
   margin: 26px 0 8px;
   font-size: 28px;
+  color: #17172b;
 }
 
 .subtitle {
@@ -79,14 +113,16 @@ a {
   margin: 20px 0 8px;
   font-size: 14px;
   font-weight: 600;
+  color: #374151;
 }
 
 .auth-card input {
   width: 100%;
   padding: 12px;
+  color: #17172b;
+  background: #ffffff;
   border: 1px solid #d1d5db;
   border-radius: 9px;
-  outline: none;
 }
 
 .auth-card input:focus {
@@ -102,33 +138,77 @@ a {
 .error {
   color: #dc2626;
   font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.success {
+  color: #15803d;
+  font-size: 14px;
+  overflow-wrap: anywhere;
 }
 
 .auth-footer {
   margin-top: 24px;
   text-align: center;
   font-size: 14px;
+  color: #475569;
+}
+
+/* =========================================
+   DASHBOARD - FULL WIDTH
+========================================= */
+
+.dashboard {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: #f5f7fc;
+  color: #1e293b;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .dashboard-header {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 5%;
-  background: white;
+  gap: 20px;
+  padding: 20px 4%;
+  background: #ffffff;
+  color: #1e293b;
   border-bottom: 1px solid #e5e7eb;
 }
 
-.secondary-btn {
-  background: white;
-  color: #635bff;
-  border: 1px solid #d1d5db;
+.dashboard-header .brand {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.header-actions span {
+  color: #1e293b;
+  font-weight: 500;
 }
 
 .dashboard-content {
-  max-width: 1000px;
-  margin: 55px auto;
-  padding: 0 24px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 40px 4%;
+}
+
+.dashboard-content h1 {
+  margin-top: 12px;
+  font-size: 34px;
+  color: #1e293b;
 }
 
 .eyebrow {
@@ -138,77 +218,265 @@ a {
   letter-spacing: 1.5px;
 }
 
-.dashboard-content h1 {
-  font-size: 34px;
+.dashboard-content > .subtitle {
+  margin-bottom: 24px;
 }
 
-.dashboard-card {
-  margin-top: 32px;
-  padding: 28px;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
+/* =========================================
+   BUTTONS
+========================================= */
+
+.secondary-btn {
+  background: #ffffff;
+  color: #5148e5;
+  border: 1px solid #d1d5db;
 }
 
-@media (max-width: 480px) {
-  .auth-card {
-    padding: 24px;
-  }
-
-  .dashboard-content h1 {
-    font-size: 28px;
-  }
+.secondary-btn:hover {
+  background: #eef2ff;
+  color: #4338ca;
 }
 
-.header-actions {
-  display: flex;
+.delete-btn {
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+.delete-btn:hover {
+  background: #ffe4e6;
+  color: #9f1239;
+}
+
+.theme-toggle {
+  display: inline-flex;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: transparent;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
 }
+
+.theme-toggle:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+/* =========================================
+   CREATE URL FORM
+========================================= */
 
 .create-form {
+  width: 100%;
   margin-top: 32px;
   padding: 24px;
-  background: white;
+  background: #ffffff;
+  color: #1e293b;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
 }
 
 .create-form label {
   display: block;
-  margin-bottom: 12px;
+  margin: 18px 0 10px;
+  color: #334155;
   font-weight: 600;
+}
+
+.create-form label:first-child {
+  margin-top: 0;
+}
+
+.create-form input,
+.create-form select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  background: #ffffff;
+  color: #17172b;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+}
+
+.create-form input::placeholder {
+  color: #64748b;
+}
+
+.create-form input:focus,
+.create-form select:focus {
+  border-color: #635bff;
+  outline: 2px solid #635bff25;
 }
 
 .url-input-row {
   display: flex;
   gap: 12px;
+  width: 100%;
 }
 
 .url-input-row input {
   flex: 1;
   min-width: 0;
+}
+
+.url-input-row button {
+  flex-shrink: 0;
+}
+
+/* =========================================
+   DASHBOARD STATISTICS
+========================================= */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  width: 100%;
+  margin: 30px 0;
+}
+
+.stat-card {
+  min-width: 0;
+  padding: 24px;
+  background: #ffffff;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+}
+
+.stat-card p {
+  margin: 0 0 14px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.stat-card h2 {
+  margin: 0 0 10px;
+  color: #17172b;
+  font-size: 32px;
+  overflow-wrap: anywhere;
+}
+
+.stat-card span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+/* =========================================
+   ANALYTICS CHART
+========================================= */
+
+.analytics-card {
+  width: 100%;
+  margin: 28px 0;
+  padding: 24px;
+  background: #ffffff;
+  color: #1e293b;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+}
+
+.analytics-card h2,
+.analytics-heading h2 {
+  margin: 0 0 8px;
+  color: #17172b;
+}
+
+.analytics-card > .subtitle,
+.analytics-heading p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.chart-container {
+  width: 100%;
+  height: 300px;
+  margin-top: 24px;
+}
+
+.recharts-cartesian-axis-tick-value {
+  fill: #475569;
+}
+
+.recharts-cartesian-grid line {
+  stroke: #e2e8f0;
+}
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px;
+}
+
+.recharts-tooltip-wrapper .recharts-tooltip-label,
+.recharts-tooltip-wrapper .recharts-tooltip-item {
+  color: #1e293b !important;
+}
+
+/* =========================================
+   SEARCH, SORT AND FILTER
+========================================= */
+
+.links-section {
+  width: 100%;
+  margin-top: 36px;
+}
+
+.links-section > h2 {
+  color: #1e293b;
+}
+
+.link-controls {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 180px 180px;
+  gap: 12px;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.link-controls input,
+.link-controls select {
+  width: 100%;
+  min-width: 0;
   padding: 12px;
-  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #17172b;
+  border: 1px solid #cbd5e1;
   border-radius: 9px;
 }
 
-.links-section {
-  margin-top: 36px;
+.link-controls input::placeholder {
+  color: #64748b;
 }
+
+/* =========================================
+   LINK CARDS
+========================================= */
 
 .links-list {
   display: grid;
   gap: 14px;
+  width: 100%;
 }
 
 .link-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+  min-width: 0;
   padding: 20px;
-  background: white;
+  background: #ffffff;
+  color: #1e293b;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
 }
@@ -218,143 +486,278 @@ a {
   overflow-wrap: anywhere;
 }
 
+.link-info a {
+  color: #4f46e5;
+  font-weight: 600;
+}
+
 .link-info p {
-  color: #6b7280;
+  color: #475569;
   font-size: 14px;
-}
-
-.link-info small {
-  color: #6b7280;
-}
-
-.success {
-  color: #15803d;
   overflow-wrap: anywhere;
 }
 
-@media (max-width: 600px) {
-  .url-input-row {
-    flex-direction: column;
-  }
-
-  .link-card {
-    align-items: flex-start;
-  }
-
-  .header-actions {
-    gap: 8px;
-  }
+.link-info small {
+  color: #64748b;
 }
 
 .link-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 8px;
+  flex-wrap: wrap;
   flex-shrink: 0;
 }
 
-.delete-btn {
-  background: #fff1f2;
-  color: #e11d48;
-  border: 1px solid #fecdd3;
+/* QR code */
+.qr-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  margin-top: 16px;
+  padding: 10px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
 }
 
-.delete-btn:hover {
-  background: #ffe4e6;
+.qr-code svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
-@media (max-width: 480px) {
-  .link-card {
-    flex-wrap: wrap;
-  }
+/* =========================================
+   LIGHT MODE
+========================================= */
 
-  .link-actions {
-    width: 100%;
-  }
+.dashboard.light-mode {
+  background: #f5f7fc;
+  color: #1e293b;
 }
 
-.link-controls {
-  display: grid;
-  grid-template-columns: minmax(180px, 1fr) 180px 180px;
-  gap: 12px;
-  margin: 20px 0;
+.light-mode .dashboard-header,
+.light-mode .stat-card,
+.light-mode .analytics-card,
+.light-mode .link-card,
+.light-mode .create-form {
+  background: #ffffff;
+  color: #1e293b;
+  border-color: #e2e8f0;
 }
 
-.link-controls input,
-.link-controls select {
-  width: 100%;
-  min-width: 0;
-  padding: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 9px;
-  background: #fff;
+.light-mode .dashboard-content h1,
+.light-mode .links-section > h2,
+.light-mode .analytics-card h2,
+.light-mode .stat-card h2 {
   color: #17172b;
 }
 
-@media (max-width: 650px) {
+.light-mode .header-actions span,
+.light-mode .create-form label {
+  color: #334155;
+}
+
+.light-mode .subtitle,
+.light-mode .stat-card p,
+.light-mode .link-info p,
+.light-mode .link-info small {
+  color: #64748b;
+}
+
+.light-mode input,
+.light-mode select {
+  background: #ffffff;
+  color: #17172b;
+  border-color: #cbd5e1;
+}
+
+.light-mode input::placeholder {
+  color: #64748b;
+}
+
+.light-mode .link-info a {
+  color: #4f46e5;
+}
+
+.light-mode .theme-toggle {
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+/* =========================================
+   DARK MODE
+========================================= */
+
+.dashboard.dark-mode {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+.dark-mode .dashboard-header,
+.dark-mode .stat-card,
+.dark-mode .analytics-card,
+.dark-mode .link-card,
+.dark-mode .create-form {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+.dark-mode .dashboard-content h1,
+.dark-mode .links-section > h2,
+.dark-mode .analytics-card h2,
+.dark-mode .stat-card h2 {
+  color: #f8fafc;
+}
+
+.dark-mode .brand {
+  color: #a5b4fc;
+}
+
+.dark-mode .header-actions span,
+.dark-mode .create-form label {
+  color: #e2e8f0;
+}
+
+.dark-mode .eyebrow {
+  color: #a5b4fc;
+}
+
+.dark-mode .subtitle,
+.dark-mode .stat-card p,
+.dark-mode .stat-card span,
+.dark-mode .analytics-card > .subtitle,
+.dark-mode .analytics-heading p,
+.dark-mode .link-info p,
+.dark-mode .link-info small {
+  color: #cbd5e1;
+}
+
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+  background: #0f172a;
+  color: #f8fafc;
+  border-color: #475569;
+}
+
+.dark-mode input::placeholder,
+.dark-mode textarea::placeholder {
+  color: #94a3b8;
+}
+
+.dark-mode select option {
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+.dark-mode .link-info a {
+  color: #a5b4fc;
+}
+
+.dark-mode .secondary-btn {
+  background: #334155;
+  color: #e0e7ff;
+  border-color: #475569;
+}
+
+.dark-mode .secondary-btn:hover {
+  background: #475569;
+  color: #ffffff;
+}
+
+.dark-mode .delete-btn {
+  background: #4c1d2b;
+  color: #fecdd3;
+  border-color: #881337;
+}
+
+.dark-mode .delete-btn:hover {
+  background: #881337;
+  color: #ffffff;
+}
+
+.dark-mode .theme-toggle {
+  background: transparent;
+  color: #f8fafc;
+  border-color: #475569;
+}
+
+.dark-mode .theme-toggle:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+/* Dark-mode chart */
+.dark-mode .recharts-cartesian-axis-tick-value {
+  fill: #e2e8f0;
+}
+
+.dark-mode .recharts-cartesian-grid line {
+  stroke: #475569;
+}
+
+.dark-mode .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: #1e293b !important;
+  border-color: #475569 !important;
+}
+
+.dark-mode .recharts-tooltip-wrapper .recharts-tooltip-label,
+.dark-mode .recharts-tooltip-wrapper .recharts-tooltip-item {
+  color: #f8fafc !important;
+}
+
+/* Error and success messages */
+.dark-mode .error {
+  color: #fca5a5;
+}
+
+.dark-mode .success {
+  color: #86efac;
+}
+
+/* =========================================
+   RESPONSIVE LAYOUT
+========================================= */
+
+@media (max-width: 900px) {
   .link-controls {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) 160px 160px;
+  }
+
+  .dashboard-content {
+    padding: 32px 3%;
+  }
+
+  .dashboard-header {
+    padding: 18px 3%;
   }
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  margin: 30px 0;
-}
-
-.stat-card {
-  background: #ffffff;
-  padding: 24px;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
-}
-
-.stat-card p {
-  color: #64748b;
-  margin: 0 0 14px;
-  font-size: 14px;
-}
-
-.stat-card h2 {
-  color: #17172b;
-  font-size: 32px;
-  margin: 0 0 10px;
-}
-
-.stat-card span {
-  color: #64748b;
-  font-size: 12px;
-}
-
-.analytics-card {
-  background: #ffffff;
-  padding: 24px;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  margin: 28px 0;
-}
-
-.analytics-heading h2 {
-  margin: 0 0 8px;
-  color: #17172b;
-}
-
-.analytics-heading p {
-  margin: 0;
-  color: #64748b;
-  font-size: 14px;
-}
-
-.chart-container {
-  width: 100%;
-  height: 280px;
-  margin-top: 24px;
-}
-
 @media (max-width: 650px) {
+  .dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .dashboard-content {
+    padding: 24px 16px;
+  }
+
+  .dashboard-content h1 {
+    font-size: 28px;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -367,5 +770,198 @@ a {
   .analytics-card {
     padding: 16px;
   }
+
+  .chart-container {
+    height: 260px;
+  }
+
+  .link-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .url-input-row {
+    flex-direction: column;
+  }
+
+  .url-input-row button {
+    width: 100%;
+  }
+
+  .link-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .link-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .theme-toggle {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
 }
 
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 24px;
+  }
+
+  .dashboard-content h1 {
+    font-size: 26px;
+  }
+
+  .create-form {
+    padding: 18px;
+  }
+
+  .stat-card h2 {
+    font-size: 28px;
+  }
+
+  .link-actions button {
+    padding: 10px 12px;
+  }
+}
+/* Remove outer white margins */
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Dashboard fills the entire browser width */
+.dashboard {
+  display: flow-root;
+  position: relative;
+  width: 100%;
+  max-width: none;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  left: 0;
+}
+
+/* Full-width header */
+.dashboard-header {
+  width: 100%;
+  margin: 0;
+}
+
+/* Content uses the available width */
+.dashboard-content {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 40px 4%;
+}
+
+
+/* Make URL creation form more compact */
+.create-form {
+  padding: 18px;
+  margin-top: 24px;
+}
+
+.create-form label {
+  margin: 12px 0 6px;
+  font-size: 14px;
+}
+
+.create-form label:first-child {
+  margin-top: 0;
+}
+
+.create-form input,
+.create-form select {
+  padding: 9px 12px;
+  height: 40px;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+/* Reduce spacing between form fields */
+.url-input-row {
+  gap: 8px;
+}
+
+.create-form .url-input-row {
+  margin-bottom: 12px;
+}
+
+/* Keep the form compact on smaller screens */
+@media (max-width: 600px) {
+  .create-form {
+    padding: 14px;
+  }
+
+  .create-form input,
+  .create-form select {
+    height: 38px;
+  }
+}
+/* Reduce width of custom alias and expiration fields */
+#createAlias,
+#customAlias,
+#expiresInDays {
+  width: 100%;
+  max-width: 450px;
+}
+
+/* Keep labels aligned with the smaller fields */
+.create-form label[for="customAlias"],
+.create-form label[for="expiresInDays"] {
+  max-width: 450px;
+}
+
+.edit-form {
+  width: 100%;
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.edit-form h3 {
+  margin-top: 0;
+}
+
+.edit-form label {
+  display: block;
+  margin: 12px 0 6px;
+  font-weight: 600;
+}
+
+.edit-form input,
+.edit-form select {
+  display: block;
+  width: 100%;
+  max-width: 450px;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+
+.edit-form .link-actions {
+  margin-top: 18px;
+}
+
+.dark-mode .edit-form {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+.dark-mode .edit-form h3,
+.dark-mode .edit-form label {
+  color: #f8fafc;
+}

@@ -34,33 +34,38 @@ app.use("/api/users", userRoutes);
 app.use("/api/urls", urlRoutes);
 
 // Redirect short URLs
+
 app.get("/:shortId", async (req, res) => {
   try {
     const url = await Url.findOne({
       shortId: req.params.shortId,
     });
-    if (url.expiresAt && url.expiresAt <= new Date()) {
-        return res.status(410).send("This short URL has expired.");
-    }
 
+    // 1. Check whether the short URL exists
     if (!url) {
       return res.status(404).send("Short URL not found");
     }
 
-    // Record the visit
+    // 2. Check whether the short URL has expired
+    if (url.expiresAt && url.expiresAt <= new Date()) {
+      return res.status(410).send("This short URL has expired.");
+    }
+
+    // 3. Record the visit
     url.visitHistory.push({
       timestamp: new Date(),
     });
 
     await url.save();
 
-    // Redirect to the original URL
+    // 4. Redirect to the original URL
     return res.redirect(url.redirectURL);
   } catch (error) {
     console.error("Redirect error:", error);
     return res.status(500).send("Something went wrong");
   }
 });
+
 
 // Start server after connecting to MongoDB
 const PORT = process.env.PORT || 5000;
