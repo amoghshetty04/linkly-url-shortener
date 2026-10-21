@@ -273,3 +273,26 @@ a {
   }
 }
 
+.link-controls {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 180px 180px;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.link-controls input,
+.link-controls select {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  background: #fff;
+  color: #17172b;
+}
+
+@media (max-width: 650px) {
+  .link-controls {
+    grid-template-columns: 1fr;
+  }
+}

@@ -15,6 +15,10 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
+  const [filterBy, setFilterBy] = useState("all");
+
   async function fetchUrls() {
     try {
       const data = await apiRequest("/api/urls");
@@ -56,36 +60,67 @@ export default function Dashboard() {
     try {
       await navigator.clipboard.writeText(shortUrl);
       setMessage("Short URL copied!");
+      setError("");
     } catch {
       setError("Unable to copy. Please copy the link manually.");
     }
   }
 
-async function handleDelete(id) {
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this link?"
-  );
-
-  if (!confirmed) return;
-
-  setError("");
-  setMessage("");
-
-  try {
-    await apiRequest(`/api/urls/${id}`, {
-      method: "DELETE",
-    });
-
-    setUrls((currentUrls) =>
-      currentUrls.filter((item) => item._id !== id)
+  async function handleDelete(id) {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this link?"
     );
 
-    setMessage("Link deleted successfully!");
-  } catch (err) {
-    setError(err.message);
-  }
-}
+    if (!confirmed) return;
 
+    setError("");
+    setMessage("");
+
+    try {
+      await apiRequest(`/api/urls/${id}`, {
+        method: "DELETE",
+      });
+
+      setUrls((currentUrls) =>
+        currentUrls.filter((item) => item._id !== id)
+      );
+
+      setMessage("Link deleted successfully!");
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  const filteredUrls = urls
+    .filter((item) => {
+      const query = search.trim().toLowerCase();
+
+      const matchesSearch =
+        item.shortId.toLowerCase().includes(query) ||
+        item.redirectURL.toLowerCase().includes(query);
+
+      const clicks = item.visitHistory.length;
+
+      const matchesFilter =
+        filterBy === "all" ||
+        (filterBy === "clicked" && clicks > 0) ||
+        (filterBy === "notClicked" && clicks === 0);
+
+      return matchesSearch && matchesFilter;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "oldest":
+          return new Date(a.createdAt) - new Date(b.createdAt);
+        case "mostClicked":
+          return b.visitHistory.length - a.visitHistory.length;
+        case "leastClicked":
+          return a.visitHistory.length - b.visitHistory.length;
+        case "newest":
+        default:
+          return new Date(b.createdAt) - new Date(a.createdAt);
+      }
+    });
 
   function handleLogout() {
     logout();
@@ -96,9 +131,14 @@ async function handleDelete(id) {
     <div className="dashboard">
       <header className="dashboard-header">
         <h2 className="brand">Linkly 🔗</h2>
+
         <div className="header-actions">
           <span>{user?.name}</span>
-          <button className="secondary-btn" onClick={handleLogout}>
+          <button
+            type="button"
+            className="secondary-btn"
+            onClick={handleLogout}
+          >
             Logout
           </button>
         </div>
@@ -107,12 +147,14 @@ async function handleDelete(id) {
       <main className="dashboard-content">
         <p className="eyebrow">YOUR WORKSPACE</p>
         <h1>Welcome, {user?.name || "User"}!</h1>
+
         <p className="subtitle">
           Create short links and manage them in one place.
         </p>
 
         <form className="create-form" onSubmit={handleCreate}>
           <label htmlFor="url">Enter your long URL</label>
+
           <div className="url-input-row">
             <input
               id="url"
@@ -122,6 +164,7 @@ async function handleDelete(id) {
               onChange={(e) => setUrl(e.target.value)}
               required
             />
+
             <button type="submit" disabled={creating}>
               {creating ? "Creating..." : "Shorten URL"}
             </button>
@@ -132,19 +175,51 @@ async function handleDelete(id) {
         {message && <p className="success">{message}</p>}
 
         <section className="links-section">
-          <h2>My Links</h2>
+          <h2>My Links ({filteredUrls.length})</h2>
+
+          <div className="link-controls">
+            <input
+              type="search"
+              placeholder="Search by short ID or original URL..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-label="Search links"
+            />
+
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              aria-label="Sort links"
+            >
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="mostClicked">Most clicked</option>
+              <option value="leastClicked">Least clicked</option>
+            </select>
+
+            <select
+              value={filterBy}
+              onChange={(e) => setFilterBy(e.target.value)}
+              aria-label="Filter links by clicks"
+            >
+              <option value="all">All links</option>
+              <option value="clicked">With clicks</option>
+              <option value="notClicked">Without clicks</option>
+            </select>
+          </div>
 
           {loading ? (
             <p>Loading your links...</p>
-          ) : urls.length === 0 ? (
+          ) : filteredUrls.length === 0 ? (
             <p className="subtitle">
-              No links yet. Create your first short URL above.
+              {urls.length === 0
+                ? "No links yet. Create your first short URL above."
+                : "No links match your search or filter."}
             </p>
           ) : (
             <div className="links-list">
-              {urls.map((item) => {
-                const shortUrl =
-                  `http://localhost:5000/${item.shortId}`;
+              {filteredUrls.map((item) => {
+                const shortUrl = `http://localhost:5000/${item.shortId}`;
 
                 return (
                   <article className="link-card" key={item._id}>
@@ -156,31 +231,31 @@ async function handleDelete(id) {
                       >
                         {shortUrl}
                       </a>
+
                       <p>{item.redirectURL}</p>
+
                       <small>
                         Clicks: {item.visitHistory.length}
                       </small>
                     </div>
 
-                    
-`   <div className="link-actions">
-  <button
-    type="button"
-    className="secondary-btn"
-    onClick={() => handleCopy(shortUrl)}
-  >
-    Copy
-  </button>
+                    <div className="link-actions">
+                      <button
+                        type="button"
+                        className="secondary-btn"
+                        onClick={() => handleCopy(shortUrl)}
+                      >
+                        Copy
+                      </button>
 
-  <button
-    type="button"
-    className="delete-btn"
-    onClick={() => handleDelete(item._id)}
-  >
-    Delete
-  </button>
-</div>
-
+                      <button
+                        type="button"
+                        className="delete-btn"
+                        onClick={() => handleDelete(item._id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </article>
                 );
               })}
