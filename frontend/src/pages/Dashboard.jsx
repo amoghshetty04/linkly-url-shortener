@@ -19,7 +19,9 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   const [url, setUrl] = useState("");
+  const [customAlias, setCustomAlias] = useState("");
   const [urls, setUrls] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
@@ -56,11 +58,17 @@ export default function Dashboard() {
     try {
       const data = await apiRequest("/api/urls", {
         method: "POST",
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({
+          url: url.trim(),
+          customAlias: customAlias.trim(),
+        }),
       });
 
       setMessage(`Short URL created: ${data.shortUrl}`);
+
+      // Clear both fields after successful creation
       setUrl("");
+      setCustomAlias("");
 
       await fetchUrls();
     } catch (err) {
@@ -281,6 +289,22 @@ export default function Dashboard() {
               {creating ? "Creating..." : "Shorten URL"}
             </button>
           </div>
+
+          <label htmlFor="customAlias">
+            Custom alias (optional)
+          </label>
+
+          <input
+            id="customAlias"
+            type="text"
+            placeholder="e.g. my-portfolio"
+            value={customAlias}
+            onChange={(e) => setCustomAlias(e.target.value)}
+            minLength={3}
+            maxLength={30}
+            pattern="[a-zA-Z0-9_-]{3,30}"
+            title="Use 3–30 letters, numbers, hyphens, or underscores."
+          />
         </form>
 
         {error && <p className="error">{error}</p>}

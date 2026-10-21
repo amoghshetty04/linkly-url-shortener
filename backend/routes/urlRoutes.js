@@ -17,53 +17,84 @@ async function getGenerator() {
 }
 
 // Create a short URL
+
 router.post("/", authenticateToken, async (req, res) => {
-    try {
-        const { url } = req.body;
+  try {
+    const { url, customAlias } = req.body;
 
-        if (!url) {
-            return res.status(400).json({
-                message: "URL is required"
-            });
-        }
-
-        let parsedUrl;
-
-        try {
-            parsedUrl = new URL(url);
-        } catch {
-            return res.status(400).json({
-                message: "Please enter a valid URL"
-            });
-        }
-
-        if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-            return res.status(400).json({
-                message: "Only HTTP and HTTPS URLs are allowed"
-            });
-        }
-
-        const nanoid = await getGenerator();
-        const shortId = nanoid(7);
-
-        const newUrl = await Url.create({
-            shortId,
-            redirectURL: parsedUrl.href,
-            createdBy: req.userId
-        });
-
-        return res.status(201).json({
-            message: "Short URL created successfully",
-            shortUrl: `http://localhost:5000/${newUrl.shortId}`,
-            data: newUrl
-        });
-    } catch (error) {
-        console.error("URL creation error:", error.message);
-
-        return res.status(500).json({
-            message: "Could not create short URL"
-        });
+    if (!url) {
+      return res.status(400).json({
+        message: "Please provide a URL.",
+      });
     }
+
+    // Validate the original URL
+    let parsedUrl;
+
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      return res.status(400).json({
+        message: "Please enter a valid URL.",
+      });
+    }
+
+    if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+      return res.status(400).json({
+        message: "Only HTTP and HTTPS URLs are allowed.",
+      });
+    }
+
+    let shortId;
+
+    if (customAlias && customAlias.trim()) {
+      shortId = customAlias.trim();
+
+      // Allow letters, numbers, hyphens, and underscores
+      if (!/^[a-zA-Z0-9_-]{3,30}$/.test(shortId)) {
+        return res.status(400).json({
+          message:
+            "Custom alias must be 3–30 characters and contain only letters, numbers, hyphens, or underscores.",
+        });
+      }
+
+      const existingUrl = await Url.findOne({ shortId });
+
+      if (existingUrl) {
+        return res.status(409).json({
+          message: "This custom alias is already taken.",
+        });
+      }
+    } else {
+      const { nanoid } = await import("nanoid");
+      shortId = nanoid(7);
+    }
+
+    const newUrl = await Url.create({
+      shortId,
+      redirectURL: parsedUrl.href,
+      createdBy: req.userId,
+      visitHistory: [],
+    });
+
+    return res.status(201).json({
+      message: "Short URL created successfully.",
+      url: newUrl,
+      shortUrl: `http://localhost:5000/${shortId}`,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: "This short URL is already taken. Try another alias.",
+      });
+    }
+
+    console.error("Create URL error:", error);
+
+    return res.status(500).json({
+      message: "Server error while creating the short URL.",
+    });
+  }
 });
 
 // Redirect to the original URL and record the click
