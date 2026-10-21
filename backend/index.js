@@ -39,6 +39,9 @@ app.get("/:shortId", async (req, res) => {
     const url = await Url.findOne({
       shortId: req.params.shortId,
     });
+    if (url.expiresAt && url.expiresAt <= new Date()) {
+        return res.status(410).send("This short URL has expired.");
+    }
 
     if (!url) {
       return res.status(404).send("Short URL not found");

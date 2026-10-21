@@ -20,7 +20,21 @@ async function getGenerator() {
 
 router.post("/", authenticateToken, async (req, res) => {
   try {
-    const { url, customAlias } = req.body;
+   const { url, customAlias, expiresInDays } = req.body;
+   let expiresAt = null;
+
+if (expiresInDays) {
+  const days = Number(expiresInDays);
+
+  if (!Number.isInteger(days) || days < 1 || days > 365) {
+    return res.status(400).json({
+      message: "Expiration must be between 1 and 365 days.",
+    });
+  }
+
+  expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + days);
+}
 
     if (!url) {
       return res.status(400).json({
@@ -71,12 +85,12 @@ router.post("/", authenticateToken, async (req, res) => {
     }
 
     const newUrl = await Url.create({
-      shortId,
-      redirectURL: parsedUrl.href,
-      createdBy: req.userId,
-      visitHistory: [],
+    shortId,
+     redirectURL: parsedUrl.href,
+    createdBy: req.userId,
+     visitHistory: [],
+        expiresAt,
     });
-
     return res.status(201).json({
       message: "Short URL created successfully.",
       url: newUrl,

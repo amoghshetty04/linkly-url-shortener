@@ -30,7 +30,7 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [filterBy, setFilterBy] = useState("all");
-
+  const [expiresInDays, setExpiresInDays] = useState("");
   // Fetch the logged-in user's URLs
   async function fetchUrls() {
     try {
@@ -59,9 +59,11 @@ export default function Dashboard() {
       const data = await apiRequest("/api/urls", {
         method: "POST",
         body: JSON.stringify({
-          url: url.trim(),
+             url: url.trim(),
           customAlias: customAlias.trim(),
+            expiresInDays: expiresInDays || null,
         }),
+        
       });
 
       setMessage(`Short URL created: ${data.shortUrl}`);
@@ -69,6 +71,7 @@ export default function Dashboard() {
       // Clear both fields after successful creation
       setUrl("");
       setCustomAlias("");
+      setExpiresInDays("");
 
       await fetchUrls();
     } catch (err) {
@@ -305,6 +308,22 @@ export default function Dashboard() {
             pattern="[a-zA-Z0-9_-]{3,30}"
             title="Use 3–30 letters, numbers, hyphens, or underscores."
           />
+          <label htmlFor="expiresInDays">
+             Link expiration (optional)
+            </label>
+
+        <select
+        id="expiresInDays"
+        value={expiresInDays}
+        onChange={(e) => setExpiresInDays(e.target.value)}
+        >
+            <option value="">Never expires</option>
+            <option value="1">1 day</option>
+            <option value="7">7 days</option>
+             <option value="30">30 days</option>
+             <option value="90">90 days</option>
+            <option value="365">365 days</option>
+        </select>
         </form>
 
         {error && <p className="error">{error}</p>}

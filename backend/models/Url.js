@@ -17,6 +17,10 @@ const urlSchema = new mongoose.Schema(
             ref: "User",
             required: true
         },
+        expiresAt: {
+             type: Date,
+            default: null,
+        },
         visitHistory: [
             {
                 timestamp: {
