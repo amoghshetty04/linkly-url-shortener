@@ -26,6 +26,30 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/urls", urlRoutes);
+const Url = require("./models/Url");
+
+app.get("/:shortId", async (req, res) => {
+    try {
+        const url = await Url.findOne({
+            shortId: req.params.shortId
+        });
+
+        if (!url) {
+            return res.status(404).send("Short URL not found");
+        }
+
+        url.visitHistory.push({
+            timestamp: new Date()
+        });
+
+        await url.save();
+
+        return res.redirect(url.redirectURL);
+    } catch (error) {
+        console.error("Redirect error:", error);
+        return res.status(500).send("Something went wrong");
+    }
+});
 
 const PORT = process.env.PORT || 5000;
 

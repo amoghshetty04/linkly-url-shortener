@@ -103,4 +103,40 @@ router.get("/", authenticateToken, async (req, res) => {
     }
 });
 
+const mongoose = require("mongoose");
+
+// Delete a URL belonging to the logged-in user
+router.delete("/:id", authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "Invalid URL ID"
+            });
+        }
+
+        const deletedUrl = await Url.findOneAndDelete({
+            _id: id,
+            createdBy: req.userId
+        });
+
+        if (!deletedUrl) {
+            return res.status(404).json({
+                message: "URL not found"
+            });
+        }
+
+        return res.status(200).json({
+            message: "URL deleted successfully"
+        });
+    } catch (error) {
+        console.error("Delete URL error:", error.message);
+
+        return res.status(500).json({
+            message: "Could not delete URL"
+        });
+    }
+});
+
 module.exports = router;
