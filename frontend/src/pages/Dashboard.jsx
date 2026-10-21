@@ -4,6 +4,16 @@ import { useAuth } from "../context/AuthContext";
 import { apiRequest } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
+
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -19,6 +29,7 @@ export default function Dashboard() {
   const [sortBy, setSortBy] = useState("newest");
   const [filterBy, setFilterBy] = useState("all");
 
+  // Fetch the logged-in user's URLs
   async function fetchUrls() {
     try {
       const data = await apiRequest("/api/urls");
@@ -34,8 +45,10 @@ export default function Dashboard() {
     fetchUrls();
   }, []);
 
+  // Create a short URL
   async function handleCreate(e) {
     e.preventDefault();
+
     setError("");
     setMessage("");
     setCreating(true);
@@ -48,6 +61,7 @@ export default function Dashboard() {
 
       setMessage(`Short URL created: ${data.shortUrl}`);
       setUrl("");
+
       await fetchUrls();
     } catch (err) {
       setError(err.message);
@@ -56,6 +70,7 @@ export default function Dashboard() {
     }
   }
 
+  // Copy a short URL
   async function handleCopy(shortUrl) {
     try {
       await navigator.clipboard.writeText(shortUrl);
@@ -66,6 +81,7 @@ export default function Dashboard() {
     }
   }
 
+  // Delete a short URL
   async function handleDelete(id) {
     const confirmed = window.confirm(
       "Are you sure you want to delete this link?"
@@ -91,6 +107,7 @@ export default function Dashboard() {
     }
   }
 
+  // Search, filter, and sort URLs
   const filteredUrls = urls
     .filter((item) => {
       const query = search.trim().toLowerCase();
@@ -112,16 +129,59 @@ export default function Dashboard() {
       switch (sortBy) {
         case "oldest":
           return new Date(a.createdAt) - new Date(b.createdAt);
+
         case "mostClicked":
           return b.visitHistory.length - a.visitHistory.length;
+
         case "leastClicked":
           return a.visitHistory.length - b.visitHistory.length;
+
         case "newest":
         default:
           return new Date(b.createdAt) - new Date(a.createdAt);
       }
     });
 
+  // Dashboard statistics
+  const totalLinks = urls.length;
+
+  const totalClicks = urls.reduce(
+    (total, item) => total + item.visitHistory.length,
+    0
+  );
+
+  const clickedLinks = urls.filter(
+    (item) => item.visitHistory.length > 0
+  ).length;
+
+  // Click analytics for the last 7 calendar days
+  const clickChartData = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() - (6 - index));
+
+    const nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + 1);
+
+    const clicks = urls.reduce((total, item) => {
+      const dailyClicks = (item.visitHistory || []).filter((visit) => {
+        const timestamp = new Date(visit.timestamp);
+        return timestamp >= date && timestamp < nextDate;
+      }).length;
+
+      return total + dailyClicks;
+    }, 0);
+
+    return {
+      date: date.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+      }),
+      clicks,
+    };
+  });
+
+  // Logout
   function handleLogout() {
     logout();
     navigate("/login");
@@ -129,11 +189,13 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
+      {/* Header */}
       <header className="dashboard-header">
         <h2 className="brand">Linkly 🔗</h2>
 
         <div className="header-actions">
           <span>{user?.name}</span>
+
           <button
             type="button"
             className="secondary-btn"
@@ -146,12 +208,62 @@ export default function Dashboard() {
 
       <main className="dashboard-content">
         <p className="eyebrow">YOUR WORKSPACE</p>
+
         <h1>Welcome, {user?.name || "User"}!</h1>
 
         <p className="subtitle">
           Create short links and manage them in one place.
         </p>
 
+        {/* Statistics cards */}
+        <div className="stats-grid">
+          <div className="stat-card">
+            <p>Total Links</p>
+            <h2>{totalLinks}</h2>
+          </div>
+
+          <div className="stat-card">
+            <p>Total Clicks</p>
+            <h2>{totalClicks}</h2>
+          </div>
+
+          <div className="stat-card">
+            <p>Active Links</p>
+            <h2>{clickedLinks}</h2>
+          </div>
+        </div>
+
+        {/* Click analytics chart */}
+        <section className="analytics-card">
+          <h2>Click Analytics</h2>
+
+          <p className="subtitle">
+            Clicks over the last 7 days
+          </p>
+
+          <div className="chart-container">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={clickChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+
+                <Line
+                  type="monotone"
+                  dataKey="clicks"
+                  name="Clicks"
+                  stroke="#635bff"
+                  strokeWidth={3}
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+
+        {/* Create URL form */}
         <form className="create-form" onSubmit={handleCreate}>
           <label htmlFor="url">Enter your long URL</label>
 
@@ -174,9 +286,11 @@ export default function Dashboard() {
         {error && <p className="error">{error}</p>}
         {message && <p className="success">{message}</p>}
 
+        {/* Links list */}
         <section className="links-section">
           <h2>My Links ({filteredUrls.length})</h2>
 
+          {/* Search, sort, and filter controls */}
           <div className="link-controls">
             <input
               type="search"
