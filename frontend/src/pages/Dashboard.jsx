@@ -47,6 +47,11 @@ export default function Dashboard() {
   const [editForm, setEditForm] = useState(EMPTY_EDIT_FORM);
   const [savingEdit, setSavingEdit] = useState(false);
 
+  const [analytics, setAnalytics] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState("");
+  const [analyticsLinkId, setAnalyticsLinkId] = useState(null);
+
   function toggleTheme() {
     setDarkMode((current) => {
       const nextTheme = !current;
@@ -280,6 +285,29 @@ export default function Dashboard() {
       }),
     [urls]
   );
+
+
+  async function handleViewAnalytics(item) {
+    setAnalyticsLinkId(item._id);
+    setAnalytics(null);
+    setAnalyticsError("");
+    setAnalyticsLoading(true);
+
+    try {
+      const data = await apiRequest(`/api/urls/${item._id}/analytics`);
+      setAnalytics(data);
+    } catch (err) {
+      setAnalyticsError(err.message || "Unable to load analytics.");
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  }
+
+  function closeAnalytics() {
+    setAnalytics(null);
+    setAnalyticsLinkId(null);
+    setAnalyticsError("");
+  }
 
   function handleLogout() {
     logout();
@@ -558,6 +586,13 @@ export default function Dashboard() {
                       <button
                         type="button"
                         className="secondary-btn"
+                        onClick={() => handleViewAnalytics(item)}
+                      >
+                        View Analytics
+                      </button>
+                      <button
+                        type="button"
+                        className="secondary-btn"
                         onClick={() => handleEdit(item)}
                       >
                         Edit
@@ -584,6 +619,64 @@ export default function Dashboard() {
                         Delete
                       </button>
                     </div>
+
+                    {analyticsLinkId === item._id && (
+                      <section className="analytics-card individual-analytics">
+                        <div className="analytics-heading">
+                          <h3>Analytics: {analytics?.shortId || item.shortId}</h3>
+                          <button
+                            type="button"
+                            className="secondary-btn"
+                            onClick={closeAnalytics}
+                          >
+                            Close
+                          </button>
+                        </div>
+
+                        {analyticsLoading && <p>Loading analytics...</p>}
+                        {analyticsError && <p className="error">{analyticsError}</p>}
+
+                        {analytics && !analyticsLoading && !analyticsError && (
+                          <>
+                            <p>
+                              <strong>Total clicks:</strong> {analytics.totalClicks}
+                            </p>
+
+                            <div className="chart-container">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={analytics.dailyClicks || []}>
+                                  <CartesianGrid strokeDasharray="3 3" />
+                                  <XAxis dataKey="date" />
+                                  <YAxis allowDecimals={false} />
+                                  <Tooltip />
+                                  <Line
+                                    type="monotone"
+                                    dataKey="clicks"
+                                    name="Clicks"
+                                    stroke="#635bff"
+                                    strokeWidth={3}
+                                    dot={{ r: 4 }}
+                                  />
+                                </LineChart>
+                              </ResponsiveContainer>
+                            </div>
+
+                            <h4>Recent visits</h4>
+                            {analytics.recentVisits?.length ? (
+                              <ul className="recent-visits">
+                                {analytics.recentVisits.map((visit, index) => (
+                                  <li key={`${visit.timestamp}-${index}`}>
+                                    {new Date(visit.timestamp).toLocaleString("en-IN")}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p>No visits recorded yet.</p>
+                            )}
+                          </>
+                        )}
+                      </section>
+                    )}
                   </article>
                 );
               })}
