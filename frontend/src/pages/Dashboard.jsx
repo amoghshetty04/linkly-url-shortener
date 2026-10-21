@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { apiRequest } from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { QRCodeSVG } from "qrcode.react";
 
 import {
   ResponsiveContainer,
@@ -20,6 +21,7 @@ export default function Dashboard() {
 
   const [url, setUrl] = useState("");
   const [customAlias, setCustomAlias] = useState("");
+  const [expiresInDays, setExpiresInDays] = useState("");
   const [urls, setUrls] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -30,7 +32,7 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [filterBy, setFilterBy] = useState("all");
-  const [expiresInDays, setExpiresInDays] = useState("");
+
   // Fetch the logged-in user's URLs
   async function fetchUrls() {
     try {
@@ -59,16 +61,14 @@ export default function Dashboard() {
       const data = await apiRequest("/api/urls", {
         method: "POST",
         body: JSON.stringify({
-             url: url.trim(),
+          url: url.trim(),
           customAlias: customAlias.trim(),
-            expiresInDays: expiresInDays || null,
+          expiresInDays: expiresInDays || null,
         }),
-        
       });
 
       setMessage(`Short URL created: ${data.shortUrl}`);
 
-      // Clear both fields after successful creation
       setUrl("");
       setCustomAlias("");
       setExpiresInDays("");
@@ -89,6 +89,43 @@ export default function Dashboard() {
       setError("");
     } catch {
       setError("Unable to copy. Please copy the link manually.");
+    }
+  }
+
+  // Download a QR code as SVG
+  function handleDownloadQR(item) {
+    const svg = document.getElementById(`qr-${item._id}`);
+
+    if (!svg) {
+      setError("Unable to find the QR code.");
+      return;
+    }
+
+    try {
+      const svgClone = svg.cloneNode(true);
+      svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+
+      const svgData = new XMLSerializer().serializeToString(svgClone);
+      const blob = new Blob([svgData], {
+        type: "image/svg+xml;charset=utf-8",
+      });
+
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = objectUrl;
+      link.download = `linkly-${item.shortId}-qr.svg`;
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      URL.revokeObjectURL(objectUrl);
+
+      setMessage("QR code downloaded!");
+      setError("");
+    } catch {
+      setError("Unable to download the QR code.");
     }
   }
 
@@ -226,7 +263,7 @@ export default function Dashboard() {
           Create short links and manage them in one place.
         </p>
 
-        {/* Statistics cards */}
+        {/* Statistics */}
         <div className="stats-grid">
           <div className="stat-card">
             <p>Total Links</p>
@@ -244,7 +281,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Click analytics chart */}
+        {/* Click analytics */}
         <section className="analytics-card">
           <h2>Click Analytics</h2>
 
@@ -308,22 +345,23 @@ export default function Dashboard() {
             pattern="[a-zA-Z0-9_-]{3,30}"
             title="Use 3–30 letters, numbers, hyphens, or underscores."
           />
-          <label htmlFor="expiresInDays">
-             Link expiration (optional)
-            </label>
 
-        <select
-        id="expiresInDays"
-        value={expiresInDays}
-        onChange={(e) => setExpiresInDays(e.target.value)}
-        >
+          <label htmlFor="expiresInDays">
+            Link expiration (optional)
+          </label>
+
+          <select
+            id="expiresInDays"
+            value={expiresInDays}
+            onChange={(e) => setExpiresInDays(e.target.value)}
+          >
             <option value="">Never expires</option>
             <option value="1">1 day</option>
             <option value="7">7 days</option>
-             <option value="30">30 days</option>
-             <option value="90">90 days</option>
+            <option value="30">30 days</option>
+            <option value="90">90 days</option>
             <option value="365">365 days</option>
-        </select>
+          </select>
         </form>
 
         {error && <p className="error">{error}</p>}
@@ -333,7 +371,7 @@ export default function Dashboard() {
         <section className="links-section">
           <h2>My Links ({filteredUrls.length})</h2>
 
-          {/* Search, sort, and filter controls */}
+          {/* Search, sort, and filter */}
           <div className="link-controls">
             <input
               type="search"
@@ -378,6 +416,10 @@ export default function Dashboard() {
               {filteredUrls.map((item) => {
                 const shortUrl = `http://localhost:5000/${item.shortId}`;
 
+                const isExpired =
+                  item.expiresAt &&
+                  new Date(item.expiresAt) <= new Date();
+
                 return (
                   <article className="link-card" key={item._id}>
                     <div className="link-info">
@@ -394,6 +436,27 @@ export default function Dashboard() {
                       <small>
                         Clicks: {item.visitHistory.length}
                       </small>
+
+                      <p>
+                        {isExpired
+                          ? "Status: Expired"
+                          : item.expiresAt
+                            ? `Expires: ${new Date(
+                                item.expiresAt
+                              ).toLocaleDateString("en-IN")}`
+                            : "Expires: Never"}
+                      </p>
+
+                      {/* QR code */}
+                      <div className="qr-code">
+                        <QRCodeSVG
+                          id={`qr-${item._id}`}
+                          value={shortUrl}
+                          size={140}
+                          level="H"
+                          includeMargin
+                        />
+                      </div>
                     </div>
 
                     <div className="link-actions">
@@ -403,6 +466,14 @@ export default function Dashboard() {
                         onClick={() => handleCopy(shortUrl)}
                       >
                         Copy
+                      </button>
+
+                      <button
+                        type="button"
+                        className="secondary-btn"
+                        onClick={() => handleDownloadQR(item)}
+                      >
+                        Download QR
                       </button>
 
                       <button
