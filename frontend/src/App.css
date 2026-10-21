@@ -1,0 +1,161 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  color: #17172b;
+  background: #f5f6ff;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  border: none;
+  border-radius: 9px;
+  background: #635bff;
+  color: white;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:hover {
+  background: #5148e5;
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+a {
+  color: #635bff;
+  text-decoration: none;
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 36px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(30, 30, 80, 0.08);
+}
+
+.brand {
+  display: inline-block;
+  color: #635bff;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.auth-card h1 {
+  margin: 26px 0 8px;
+  font-size: 28px;
+}
+
+.subtitle {
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.auth-card label {
+  display: block;
+  margin: 20px 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.auth-card input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  outline: none;
+}
+
+.auth-card input:focus {
+  border-color: #635bff;
+  box-shadow: 0 0 0 3px #635bff20;
+}
+
+.auth-card button {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.error {
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.auth-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 5%;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.secondary-btn {
+  background: white;
+  color: #635bff;
+  border: 1px solid #d1d5db;
+}
+
+.dashboard-content {
+  max-width: 1000px;
+  margin: 55px auto;
+  padding: 0 24px;
+}
+
+.eyebrow {
+  color: #635bff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.dashboard-content h1 {
+  font-size: 34px;
+}
+
+.dashboard-card {
+  margin-top: 32px;
+  padding: 28px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 24px;
+  }
+
+  .dashboard-content h1 {
+    font-size: 28px;
+  }
+}
